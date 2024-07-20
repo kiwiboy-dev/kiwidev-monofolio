@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@kiwidev-monofolio/kiwidev-ui": ["lib/src/index.ts"]
+      "@kiwidev-monofolio/kiwidev-ui": ["libs/kiwidev-ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
