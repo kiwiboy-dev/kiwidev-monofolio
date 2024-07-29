@@ -1,18 +1,39 @@
-import { Theme, ThemePanel, ThemeProps } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
-interface ThemeWrapperProps {
-  children: React.ReactNode;
-  themeProps: ThemeProps;
-  addThemePanel: boolean;
+export type ThemeWrapperOptions = {
+  colors: {
+    [color: string]: ColorRange;
+  }
+};
+
+/**
+ * Use https://smart-swatch.netlify.app to calculate your color range
+ */
+type ColorRange = {
+  50: string,
+  100: string,
+  200: string,
+  300: string,
+  400: string,
+  500: string,
+  600: string,
+  700: string,
+  800: string,
+  900: string,
 }
 
-export function ThemeWrapper({children, themeProps, addThemePanel = false}: ThemeWrapperProps) {
+type ThemeWrapperProps = {
+  children: React.ReactNode;
+  themeOptions?: ThemeWrapperOptions | Record<string, never>;
+}
+
+export const ThemeWrapper = ({children, themeOptions = {}}: ThemeWrapperProps) => {
+  const theme = extendTheme(themeOptions);
+
   return(
-    <Theme {...themeProps}>
+    <ChakraProvider theme={theme}>
       {children}
-      {addThemePanel && <ThemePanel />}
-    </Theme>
+    </ChakraProvider>
   )
 }
 

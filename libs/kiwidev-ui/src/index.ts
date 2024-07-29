@@ -1,1 +1,2 @@
-export * from './lib/kiwidev-ui';
+export * from './lib/themeWrapper';
+export * from './lib/navBar';
