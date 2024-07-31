@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Flex, Tabs, TabList, Tab, Box, Button, useTheme } from '@chakra-ui/react';
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
+import { Flex, Tabs, TabList, Tab, Box, Button, useTheme, useToken } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type Section = {
@@ -8,14 +8,17 @@ type Section = {
 }
 
 type NavbarProps = {
+  navBarRef: React.MutableRefObject<(HTMLElement | null)>;
   sections: Section[];
   sectionRefs: React.MutableRefObject<(HTMLElement | null)[]>;
 }
 
-export const NavBar = ({ sections, sectionRefs }: NavbarProps) => {
+export const NavBar = ({ navBarRef, sections, sectionRefs }: NavbarProps) => {
   const theme = useTheme();
+  const primaryColor = useToken('colors', 'primary.300', theme.colors.blue[300]);
   const [activeTab, setActiveTab] = useState<number>(0);
-  const navBarRef = useRef<HTMLDivElement | null>(null);
+  const [activeTabWidth, setActiveTabWidth] = useState<number>(0);
+  const textRefs = useRef<(HTMLElement | null)[]>([]);
 
   const handleTabClick = useCallback((index: number) => {
     const navBarHeight = navBarRef.current?.offsetHeight || 0;
@@ -27,8 +30,7 @@ export const NavBar = ({ sections, sectionRefs }: NavbarProps) => {
   }, [sectionRefs]);
 
   const updateActiveTab = useCallback(() => {
-    const navBarHeight = navBarRef.current?.offsetHeight || 0;
-    const scrollPosition = window.scrollY + navBarHeight + 1; // +1 to account for minor discrepancies
+    const scrollPosition = window.scrollY + (window.innerHeight/2);
 
     let newActiveTab = 0;
     sectionRefs.current.forEach((section, index) => {
@@ -39,6 +41,15 @@ export const NavBar = ({ sections, sectionRefs }: NavbarProps) => {
 
     setActiveTab(newActiveTab);
   }, [sectionRefs]);
+
+  useLayoutEffect(() => {
+    const activeTextElement = textRefs.current[activeTab];
+    if (activeTextElement) {
+      const textWidth = activeTextElement.getBoundingClientRect().width;
+      console.log(textWidth);
+      setActiveTabWidth(textWidth);
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     const handleScrollEvent = () => {
@@ -55,22 +66,24 @@ export const NavBar = ({ sections, sectionRefs }: NavbarProps) => {
   }, [updateActiveTab]);
 
   return (
-    <Flex ref={navBarRef} as="header" position="fixed" w="100%" bg="white" zIndex="200" boxShadow="md">
-        <Tabs index={activeTab} variant="line" w="100%" onChange={(index) => handleTabClick(index)}>
+    <Flex ref={navBarRef} as="header" position="fixed" w="100%" bg="primary.50" zIndex="200">
+        <Tabs index={activeTab} variant="unstyled" w="100%" onChange={(index) => handleTabClick(index)}>
           <TabList>
             {sections.map((section, index) => (
-              <Tab key={index} position="relative" _selected={{}}>
-                {section.name}
+              <Tab key={index} position="relative">
+                <span ref={el => textRefs.current[index] = el}>
+                  {section.name}
+                </span>
                 {activeTab === index && (
                   <motion.div
                     layoutId="activeTab"
                     style={{
                       position: 'absolute',
                       bottom: '4px',
-                      left: 0,
-                      right: 0,
+                      borderRadius: '2px',
                       height: '4px',
-                      background: theme.colors.green[500],
+                      width: `${activeTabWidth}px`,
+                      background: primaryColor,
                     }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />

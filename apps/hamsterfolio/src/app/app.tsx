@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import styles from './app.module.scss';
 import { ThemeWrapper, ThemeWrapperOptions, NavBar } from '@kiwidev-monofolio/kiwidev-ui';
 import { Box } from '@chakra-ui/react';
@@ -60,18 +60,26 @@ const sections: Section[] = [
 ];
 
 export function App() {
+
+  const navBarRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+  const [navBarHeight, setNavBarHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    if(navBarRef.current)
+      setNavBarHeight(navBarRef.current.offsetHeight);
+  }, [])
 
   return (
     <ThemeWrapper themeOptions={themeOptions}>
-      <NavBar sections={sections} sectionRefs={sectionRefs} />
-      <Box pt="42px">
+      <NavBar navBarRef={navBarRef} sections={sections} sectionRefs={sectionRefs} />
+      <Box pt={`${navBarHeight}px`}>
         {sections.map((section, index) => (
           <Box
             key={index}
             ref={el => sectionRefs.current[index] = el}
             id={section.id}
-            h="100vh"
+            h={`calc(100vh * ${index+1})`}
             bg={`gray.${100 * (index + 1)}`}
           >
             <h2>{section.name}</h2>
