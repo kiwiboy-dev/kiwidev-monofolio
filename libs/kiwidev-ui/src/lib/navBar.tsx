@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
-import { Flex, Tabs, TabList, Tab, Box, Button, useTheme, useToken } from '@chakra-ui/react';
+import { Flex, Tabs, TabList, Tab, Box, Button, useTheme, useToken, Image } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import placeholderLogo from '../assets/placeholder_logo.png';
 
 type Section = {
   name: string;
@@ -11,9 +12,10 @@ type NavbarProps = {
   navBarRef: React.MutableRefObject<(HTMLElement | null)>;
   sections: Section[];
   sectionRefs: React.MutableRefObject<(HTMLElement | null)[]>;
+  logoSrc?: string;
 }
 
-export const NavBar = ({ navBarRef, sections, sectionRefs }: NavbarProps) => {
+export const NavBar = ({ navBarRef, sections, sectionRefs, logoSrc }: NavbarProps) => {
   const theme = useTheme();
   const primaryColor = useToken('colors', 'primary.300', theme.colors.blue[300]);
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -66,7 +68,8 @@ export const NavBar = ({ navBarRef, sections, sectionRefs }: NavbarProps) => {
   }, [updateActiveTab]);
 
   return (
-    <Flex ref={navBarRef} as="header" position="fixed" w="100%" bg="primary.50" zIndex="200">
+    <Flex ref={navBarRef} as="header" position="fixed" w="100%" bg="primary.50" zIndex="200" p="4px" alignItems="center">
+      <Image src={logoSrc || placeholderLogo} alt="Logo" borderRadius="full" boxSize="40px" />
         <Tabs index={activeTab} variant="unstyled" w="100%" onChange={(index) => handleTabClick(index)}>
           <TabList>
             {sections.map((section, index) => (
@@ -79,7 +82,7 @@ export const NavBar = ({ navBarRef, sections, sectionRefs }: NavbarProps) => {
                     layoutId="activeTab"
                     style={{
                       position: 'absolute',
-                      bottom: '4px',
+                      bottom: '6px',
                       borderRadius: '2px',
                       height: '4px',
                       width: `${activeTabWidth}px`,
